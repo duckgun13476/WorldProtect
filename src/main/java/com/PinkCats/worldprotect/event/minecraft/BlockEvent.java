@@ -40,8 +40,8 @@ public class BlockEvent {
                 ItemStack,
                 "PickUp"
         ));
-        if (IsFull)
-            System.out.println("queue is full drop mox data");
+        if (!IsFull)
+            System.out.println("PickUpEvent Not Record!");
 
     }
 
@@ -53,15 +53,23 @@ public class BlockEvent {
         int ItemCount = ItemStack.getCount();
         boolean HasNbt = ItemStack.hasTag();
 
-        System.out.println("Item Toss!");
-        System.out.println(player.getName()); //player
-        System.out.println(player.getStringUUID()); //player
-        System.out.println(Item); //item
+        //System.out.println(ItemStack.getItem().getDescriptionId());
 
-        if (HasNbt)
-            System.out.println(event.getEntity().getItem().getTag()); //nbt
-        System.out.println(ItemCount);  //count
+        boolean IsFull = ItemRawQueue.offer(new RecordItemRaw(
+                player.getName().getString(),
+                player.getStringUUID(),
+                player.level().dimension().location().toString(),
+                player.getBlockX(),
+                player.getBlockY(),
+                player.getBlockZ(),
+                ItemStack,
+                "DropDown"
+        ));
+        if (!IsFull)
+            System.out.println("DropDownEvent Not Record!");
+
     }
+
 
 
 

@@ -26,7 +26,6 @@ public class RecordItem {
         this.rollback = rollback;
     }
 
-    // Getter方法（批量插入时需要读取字段值）
     public int getTime() { return time; }
     public short getOperator() {
         isSafeToShort(operator,"Operator");

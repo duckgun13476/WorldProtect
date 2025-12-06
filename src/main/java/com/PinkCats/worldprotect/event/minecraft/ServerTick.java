@@ -18,7 +18,11 @@ public class ServerTick {
     public static void RunTask() {
         if (TaskLock.compareAndSet(false, true)) {
             try {
+                long time = System.currentTimeMillis();
                 WorldProtectKineticTick();
+                if (System.currentTimeMillis() - time > 1000)
+                    System.out.println("Run time: "+(System.currentTimeMillis() - time) + " ms");
+
             } finally {
                 TaskLock.set(false);
             }

@@ -20,7 +20,7 @@ public class SqlNbtQuery {
         }
         PreparedStatement stmt;
         String insertSql = "INSERT INTO Map_Nbt (nbt) VALUES (?)";
-        stmt = statement.getConnection().prepareStatement(insertSql);
+        stmt = statement.getConnection().prepareStatement(insertSql,Statement.RETURN_GENERATED_KEYS);
         stmt.setBytes(1, nbtBlob);
         stmt.executeUpdate();
         try (ResultSet rs = stmt.getGeneratedKeys()) {
@@ -32,18 +32,4 @@ public class SqlNbtQuery {
         }
     }
 
-
-
-    public static byte[] itemStackToBlob(ItemStack itemStack) {
-        // 此处替换为你实际的ItemStack序列化逻辑（比如NBT序列化）
-        // 示例：用ByteArrayOutputStream序列化NBT
-        try (java.io.ByteArrayOutputStream bos = new java.io.ByteArrayOutputStream();
-             java.io.ObjectOutputStream oos = new java.io.ObjectOutputStream(bos)) {
-            // 假设ItemStack可序列化（实际MC需用NBTTagCompound序列化）
-            oos.writeObject(itemStack.save(new net.minecraft.nbt.CompoundTag()));
-            return bos.toByteArray();
-        } catch (Exception e) {
-            throw new RuntimeException("ItemStack序列化为BLOB失败", e);
-        }
-    }
 }

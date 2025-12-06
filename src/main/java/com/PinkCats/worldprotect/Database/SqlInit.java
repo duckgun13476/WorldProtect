@@ -2,6 +2,7 @@ package com.PinkCats.worldprotect.Database;
 
 import com.PinkCats.worldprotect.Worldprotect;
 
+import java.io.IOException;
 import java.sql.*;
 
 import static com.PinkCats.worldprotect.Database.Operator.SqlMapQuery.*;
@@ -47,6 +48,8 @@ public class SqlInit {
                 System.out.println("[SQL Varify Error] Please Check Username/Password: "+e.getMessage());
             else
                 System.out.println("[SQL Other Error]: "+e.getMessage());
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
     }

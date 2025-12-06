@@ -11,7 +11,7 @@ import static com.PinkCats.worldprotect.Database.SqlInit.SafeSql;
 
 public class Main {
 
-    public static List<RecordItem> recordItemList = new ArrayList<>();
+
 
 
     public static void main(String[] args) {

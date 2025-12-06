@@ -4,6 +4,7 @@ import com.PinkCats.worldprotect.Database.Item.RecordItem;
 import com.PinkCats.worldprotect.Database.Item.RecordItemRaw;
 import net.minecraft.world.item.ItemStack;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -11,32 +12,34 @@ import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
+import static com.PinkCats.worldprotect.Database.Lib.NBTData.PackageItemStack;
 import static com.PinkCats.worldprotect.Database.Lib.TimeUtils.getCurrentTimestamp;
-import static com.PinkCats.worldprotect.Database.Main.recordItemList;
 import static com.PinkCats.worldprotect.Database.Operator.SqlMapQuery.*;
 import static com.PinkCats.worldprotect.Database.Operator.SqlNbtQuery.InsertMapNbtItem;
-import static com.PinkCats.worldprotect.Database.Operator.SqlNbtQuery.itemStackToBlob;
 import static com.PinkCats.worldprotect.Database.SqlEntry.batchInsertRecordItem;
-import static com.PinkCats.worldprotect.Database.SqlInit.DataBaseInit;
 import static com.PinkCats.worldprotect.Database.SqlInit.SafeSql;
 
 public class WorldProtectKinetic {
 
     private static final int QUEUE_CAPACITY = 5000;
-    public static BlockingQueue<RecordItemRaw> ItemRawQueue = new ArrayBlockingQueue<>(QUEUE_CAPACITY);
-
+    public static BlockingQueue<RecordItemRaw> ItemRawQueue = new ArrayBlockingQueue<>(5000);
+    public static List<RecordItem> recordItemList = new ArrayList<>();
 
     public static void WorldProtectKineticTick(){
-        System.out.println("tick");
+
+        if (ItemRawQueue.isEmpty())
+            return;
         SafeSql((s)-> {
             CookItemData(s);
 
             batchInsertRecordItem(s, recordItemList, 1000);
         });
 
+
+
     }
 
-    private static void CookItemData(Statement s) throws SQLException {
+    private static void CookItemData(Statement s) throws SQLException, IOException {
 
 
         List<RecordItemRaw> ItemsToProcess = new ArrayList<>();
@@ -46,6 +49,7 @@ public class WorldProtectKinetic {
             return; // 无数据，直接返回，避免空处理
         }
 
+        recordItemList.clear();
         for (RecordItemRaw recordItemRaw : ItemsToProcess) {
 
             int WorldMap = FetchMapWorldId(s,recordItemRaw.getWorld());
@@ -54,10 +58,10 @@ public class WorldProtectKinetic {
             int ItemMap;
 
             ItemStack item = recordItemRaw.getItemdata();
-            ItemMap = FetchMapItemId(s,item.getItem().toString());
+            ItemMap = FetchMapItemId(s,item.getItem().getDescriptionId());
             if (item.hasTag()) {
 
-                ItemMap = - InsertMapNbtItem(s,itemStackToBlob(item));
+                ItemMap = - InsertMapNbtItem(s,PackageItemStack(item));
 
 
             }

@@ -26,7 +26,6 @@ public class SqlEntry {
     public static void batchInsertRecordItem(Statement statement, List<RecordItem> recordItemList, int batchSize) throws SQLException {
         // 1. 基础校验
         if (recordItemList == null || recordItemList.isEmpty()) {
-            System.err.println("批量插入失败：待插入数据列表为空");
             return;
         }
         if (batchSize <= 0) {

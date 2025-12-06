@@ -64,16 +64,9 @@ public class Worldprotect {
 
 
 
-    private void Inject(FMLCommonSetupEvent event) {
-        // 异步执行：避免阻塞游戏启动，FMLCommonSetupEvent必须异步
-        // 执行驱动注入（核心步骤）
-        event.enqueueWork(MySQLDriverInjector::inject);
-    }
-
 
 
     public Worldprotect() {
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::Inject);
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
 
         // Register the commonSetup method for modloading
@@ -95,7 +88,7 @@ public class Worldprotect {
 
         RegisterEvents();
         RegisterWorldProtectKinetic();
-        DataBaseInit();
+
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
         } catch (ClassNotFoundException e) {
@@ -111,9 +104,7 @@ public class Worldprotect {
         // Some common setup code
         LOGGER.info("HELLO FROM COMMON SETUP");
         LOGGER.info("DIRT BLOCK >> {}", ForgeRegistries.BLOCKS.getKey(Blocks.DIRT));
-
         if (Config.logDirtBlock) LOGGER.info("DIRT BLOCK >> {}", ForgeRegistries.BLOCKS.getKey(Blocks.DIRT));
-
         LOGGER.info(Config.magicNumberIntroduction + Config.magicNumber);
 
         Config.items.forEach((item) -> LOGGER.info("ITEM >> {}", item.toString()));
@@ -124,11 +115,10 @@ public class Worldprotect {
         if (event.getTabKey() == CreativeModeTabs.BUILDING_BLOCKS) event.accept(EXAMPLE_BLOCK_ITEM);
     }
 
-    // You can use SubscribeEvent and let the Event Bus discover methods to call
+
     @SubscribeEvent
     public void onServerStarting(ServerStartingEvent event) {
-        // Do something when the server starts
-        LOGGER.info("HELLO from server starting");
+        DataBaseInit();
     }
 
 
