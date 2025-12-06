@@ -167,8 +167,6 @@ public class SqlMapQuery {
     public static Map<String, Integer> PlayerMapID = new HashMap<>();
     public static int FetchMapOperatorId(Statement s, String PlayerId,String UUID) throws SQLException {
         RecordPlayer Player = new RecordPlayer(PlayerId,UUID);
-        System.out.println(PlayerMapID);
-
         Object result = PlayerMapID.get(UUID);
         if (result == null) {
             InsertMapPlayer(s, Player);

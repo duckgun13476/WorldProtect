@@ -1,7 +1,5 @@
 package com.PinkCats.worldprotect.Database.Operator;
 
-import net.minecraft.world.item.ItemStack;
-
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
