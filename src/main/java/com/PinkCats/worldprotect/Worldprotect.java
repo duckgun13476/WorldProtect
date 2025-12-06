@@ -1,4 +1,4 @@
-package org.example.PinkCats.worldprotect;
+package com.PinkCats.worldprotect;
 
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.Minecraft;
@@ -29,9 +29,14 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import org.slf4j.Logger;
 
+import static com.PinkCats.worldprotect.Database.SqlInit.DataBaseInit;
+import static com.PinkCats.worldprotect.event.minecraft.ServerTick.RegisterWorldProtectKinetic;
+import static com.PinkCats.worldprotect.event.minecraft.BlockEvent.RegisterEvents;
+
 // The value here should match an entry in the META-INF/mods.toml file
 @Mod(Worldprotect.MODID)
 public class Worldprotect {
+
 
     // Define mod id in a common place for everything to reference
     public static final String MODID = "worldprotect";
@@ -57,7 +62,18 @@ public class Worldprotect {
         output.accept(EXAMPLE_ITEM.get()); // Add the example item to the tab. For your own tabs, this method is preferred over the event
     }).build());
 
+
+
+    private void Inject(FMLCommonSetupEvent event) {
+        // 异步执行：避免阻塞游戏启动，FMLCommonSetupEvent必须异步
+        // 执行驱动注入（核心步骤）
+        event.enqueueWork(MySQLDriverInjector::inject);
+    }
+
+
+
     public Worldprotect() {
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::Inject);
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
 
         // Register the commonSetup method for modloading
@@ -73,8 +89,19 @@ public class Worldprotect {
         // Register ourselves for server and other game events we are interested in
         MinecraftForge.EVENT_BUS.register(this);
 
+
         // Register the item to a creative tab
         modEventBus.addListener(this::addCreative);
+
+        RegisterEvents();
+        RegisterWorldProtectKinetic();
+        DataBaseInit();
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+        } catch (ClassNotFoundException e) {
+            System.out.println("Failed to load MySQL driver");
+        }
+
 
         // Register our mod's ForgeConfigSpec so that Forge can create and load the config file for us
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.SPEC);
@@ -103,6 +130,7 @@ public class Worldprotect {
         // Do something when the server starts
         LOGGER.info("HELLO from server starting");
     }
+
 
     // You can use EventBusSubscriber to automatically register all static methods in the class annotated with @SubscribeEvent
     @Mod.EventBusSubscriber(modid = MODID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)

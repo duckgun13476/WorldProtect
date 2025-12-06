@@ -1,7 +1,7 @@
 {
   "required": true,
   "minVersion": "0.8",
-  "package": "org.example.PinkCats.worldprotect.mixin",
+  "package": "com.PinkCats.worldprotect.mixin",
   "compatibilityLevel": "JAVA_8",
   "refmap": "worldprotect.refmap.json",
   "mixins": [
