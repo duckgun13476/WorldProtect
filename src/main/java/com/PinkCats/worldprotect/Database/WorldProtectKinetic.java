@@ -46,7 +46,7 @@ public class WorldProtectKinetic {
         ItemRawQueue.drainTo(ItemsToProcess);
 
         if (ItemsToProcess.isEmpty()) {
-            return; // 无数据，直接返回，避免空处理
+            return;
         }
 
         recordItemList.clear();

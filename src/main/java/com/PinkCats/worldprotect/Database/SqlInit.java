@@ -1,7 +1,5 @@
 package com.PinkCats.worldprotect.Database;
 
-import com.PinkCats.worldprotect.Worldprotect;
-
 import java.io.IOException;
 import java.sql.*;
 
@@ -49,7 +47,7 @@ public class SqlInit {
             else
                 System.out.println("[SQL Other Error]: "+e.getMessage());
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("[IOE Error]: "+e.getMessage());
         }
 
     }

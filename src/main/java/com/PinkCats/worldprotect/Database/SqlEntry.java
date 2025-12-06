@@ -49,18 +49,18 @@ public class SqlEntry {
             for (RecordItem item : recordItemList) {
                 // 单条数据合法性校验（过滤无效数据，不影响整批插入）
                 if (!validateRecordItem(item)) {
-                    System.err.println("跳过无效数据：time=" + item.getTime() + ", x=" + item.getX() + ", y=" + item.getY() + ", z=" + item.getZ());
+                    System.err.println("跳过无效数据：time=" + item.time() + ", x=" + item.x() + ", y=" + item.y() + ", z=" + item.z());
                     continue;
                 }
 
                 // 设置参数（与单条插入逻辑一致）
-                pstmt.setInt(1, item.getTime());
+                pstmt.setInt(1, item.time());
                 pstmt.setShort(2, item.getOperator());
                 pstmt.setShort(3, item.getWorld());
-                pstmt.setInt(4, item.getX());
-                pstmt.setInt(5, item.getY());
-                pstmt.setInt(6, item.getZ());
-                pstmt.setInt(7, item.getItemdata());
+                pstmt.setInt(4, item.x());
+                pstmt.setInt(5, item.y());
+                pstmt.setInt(6, item.z());
+                pstmt.setInt(7, item.ItemData());
                 pstmt.setShort(8, item.getBehaviour());
                 pstmt.setShort(9, item.getBehaviour());
                 pstmt.setShort(10, item.getRollback());
