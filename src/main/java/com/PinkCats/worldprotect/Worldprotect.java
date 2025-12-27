@@ -3,6 +3,7 @@ package com.PinkCats.worldprotect;
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
@@ -29,6 +30,8 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import org.slf4j.Logger;
 
+import java.lang.reflect.Field;
+
 import static com.PinkCats.worldprotect.Database.SqlInit.DataBaseInit;
 import static com.PinkCats.worldprotect.event.minecraft.ServerTick.RegisterWorldProtectKinetic;
 import static com.PinkCats.worldprotect.event.minecraft.BlockEvent.RegisterEvents;
@@ -37,6 +40,12 @@ import static com.PinkCats.worldprotect.event.minecraft.BlockEvent.RegisterEvent
 @Mod(Worldprotect.MODID)
 public class Worldprotect {
 
+    public static ResourceLocation DropResourceLocation(String Location){
+        return ResourceLocation.parse(Location);
+    }
+    public static ResourceLocation DropResourceLocation(String NameSpace, String Path){
+        return ResourceLocation.fromNamespaceAndPath(NameSpace,Path);
+    }
 
     // Define mod id in a common place for everything to reference
     public static final String MODID = "worldprotect";
@@ -67,7 +76,10 @@ public class Worldprotect {
 
 
     public Worldprotect() {
-        IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
+        // Only for 1.20.1 forge
+        ModLoadingContext modLoadingContext = getModLoadingContextViaReflection();
+        FMLJavaModLoadingContext modContext = modLoadingContext.extension();
+        IEventBus modEventBus = modContext.getModEventBus();
 
         // Register the commonSetup method for modloading
         modEventBus.addListener(this::commonSetup);
@@ -97,7 +109,7 @@ public class Worldprotect {
 
 
         // Register our mod's ForgeConfigSpec so that Forge can create and load the config file for us
-        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.SPEC);
+        modLoadingContext.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
     }
 
     private void commonSetup(final FMLCommonSetupEvent event) {
@@ -131,6 +143,23 @@ public class Worldprotect {
             // Some client setup code
             LOGGER.info("HELLO FROM CLIENT SETUP");
             LOGGER.info("MINECRAFT NAME >> {}", Minecraft.getInstance().getUser().getName());
+        }
+    }
+
+
+    //Tool Func
+
+
+    @SuppressWarnings("unchecked")
+    private static ModLoadingContext getModLoadingContextViaReflection() {
+        try {
+            Field contextField = ModLoadingContext.class.getDeclaredField("context");
+            contextField.setAccessible(true);
+            ThreadLocal<ModLoadingContext> contextThreadLocal = (ThreadLocal<ModLoadingContext>) contextField.get(null);
+            return contextThreadLocal.get();
+
+        } catch (Exception e) {
+            throw new RuntimeException("CreateLazyTick got ERROR in Init:", e);
         }
     }
 }

@@ -1,6 +1,5 @@
 package com.PinkCats.worldprotect;
 
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -11,6 +10,8 @@ import net.minecraftforge.registries.ForgeRegistries;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import static com.PinkCats.worldprotect.Worldprotect.DropResourceLocation;
 
 // An example config class. This is not required, but it's a good idea to have one to keep your config organized.
 // Demonstrates how to use Forge's config APIs
@@ -35,7 +36,7 @@ public class Config {
     public static Set<Item> items;
 
     private static boolean validateItemName(final Object obj) {
-        return obj instanceof final String itemName && ForgeRegistries.ITEMS.containsKey(new ResourceLocation(itemName));
+        return obj instanceof final String itemName && ForgeRegistries.ITEMS.containsKey(DropResourceLocation(itemName));
     }
 
     @SubscribeEvent
@@ -45,6 +46,6 @@ public class Config {
         magicNumberIntroduction = MAGIC_NUMBER_INTRODUCTION.get();
 
         // convert the list of strings into a set of items
-        items = ITEM_STRINGS.get().stream().map(itemName -> ForgeRegistries.ITEMS.getValue(new ResourceLocation(itemName))).collect(Collectors.toSet());
+        items = ITEM_STRINGS.get().stream().map(itemName -> ForgeRegistries.ITEMS.getValue(DropResourceLocation(itemName))).collect(Collectors.toSet());
     }
 }
