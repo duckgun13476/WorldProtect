@@ -22,7 +22,8 @@ import static com.PinkCats.worldprotect.Database.SqlInit.SafeSql;
 public class WorldProtectKinetic {
 
     private static final int QUEUE_CAPACITY = 5000;
-    public static BlockingQueue<RecordItemRaw> ItemRawQueue = new ArrayBlockingQueue<>(5000);
+
+    public static BlockingQueue<RecordItemRaw> ItemRawQueue = new ArrayBlockingQueue<>(QUEUE_CAPACITY);
     public static List<RecordItem> recordItemList = new ArrayList<>();
 
     public static void WorldProtectKineticTick(){
@@ -49,7 +50,16 @@ public class WorldProtectKinetic {
             return;
         }
 
+
+
+
+
+
+
         recordItemList.clear();
+
+        // Map and insert
+        List<RecordItem> ItemsAfterMap = new ArrayList<>();
         for (RecordItemRaw recordItemRaw : ItemsToProcess) {
 
             int WorldMap = FetchMapWorldId(s,recordItemRaw.getWorld());
@@ -60,14 +70,10 @@ public class WorldProtectKinetic {
             ItemStack item = recordItemRaw.getItemdata();
             ItemMap = FetchMapItemId(s,item.getItem().getDescriptionId());
             if (item.hasTag()) {
-
                 ItemMap = - InsertMapNbtItem(s,PackageItemStack(item));
-
-
             }
 
-
-            recordItemList.add(
+            ItemsAfterMap.add(
                     new RecordItem(
                             getCurrentTimestamp(),
                             OperatorMap,
@@ -81,10 +87,31 @@ public class WorldProtectKinetic {
                             0
                     )
             );
+        }
 
+        // Algorith for reduce insert
+        List<RecordItem> ItemsAfterAlgorith = new ArrayList<>();
+        outer:
+        for  (RecordItem ItemMap : ItemsAfterMap) {
 
+            if (ItemsAfterAlgorith.isEmpty()) {
+                ItemsAfterAlgorith.add(ItemMap);
+                continue;
+            }
+
+            for (RecordItem LockedMap : ItemsAfterAlgorith) {
+                if (RecordItem.CanBulk(LockedMap, ItemMap)){
+                    LockedMap.setCount((short) (LockedMap.getCount()+ItemMap.getCount()));
+                    continue outer;
+                }
+            }
+            ItemsAfterAlgorith.add(ItemMap);
 
         }
+
+        // Drain All element.
+        recordItemList.addAll(ItemsAfterAlgorith);
+
 
 
     }

@@ -38,49 +38,50 @@ public class SqlEntry {
                 "time, operator, world, x, y, z, itemdata,count,Behaviour, rollback" +
                 ") VALUES (?, ?, ?, ?, ?, ?, ?,?, ?, ?)";
 
-        PreparedStatement pstmt = null;
+        PreparedStatement PSM = null;
         try {
             // 关闭自动提交，手动控制事务（提升批量插入性能）
             statement.getConnection().setAutoCommit(false);
-            pstmt = statement.getConnection().prepareStatement(insertSql);
+            PSM = statement.getConnection().prepareStatement(insertSql);
 
             // 3. 遍历数据，添加到批次
             int count = 0; // 计数，达到批次大小则提交
             for (RecordItem item : recordItemList) {
                 // 单条数据合法性校验（过滤无效数据，不影响整批插入）
                 if (!validateRecordItem(item)) {
-                    System.err.println("跳过无效数据：time=" + item.time() + ", x=" + item.x() + ", y=" + item.y() + ", z=" + item.z());
+                    System.err.println("跳过无效数据：time=" + item.getTime() + ", x=" + item.getX() + ", y=" + item.getY() + ", z=" + item.getZ());
                     continue;
                 }
 
                 // 设置参数（与单条插入逻辑一致）
-                pstmt.setInt(1, item.time());
-                pstmt.setShort(2, item.getOperator());
-                pstmt.setShort(3, item.getWorld());
-                pstmt.setInt(4, item.x());
-                pstmt.setInt(5, item.y());
-                pstmt.setInt(6, item.z());
-                pstmt.setInt(7, item.ItemData());
-                pstmt.setShort(8, item.getBehaviour());
-                pstmt.setShort(9, item.getBehaviour());
-                pstmt.setShort(10, item.getRollback());
+                System.out.println();
+                PSM.setInt(1, item.getTime());
+                PSM.setShort(2, item.getOperator());
+                PSM.setShort(3, item.getWorld());
+                PSM.setInt(4, item.getX());
+                PSM.setInt(5, item.getY());
+                PSM.setInt(6, item.getZ());
+                PSM.setInt(7, item.getItemData());
+                PSM.setShort(8, (short) item.getCount());
+                PSM.setShort(9, item.getBehaviour());
+                PSM.setShort(10, (short) item.getRollback());
 
                 // 添加到批次
-                pstmt.addBatch();
+                PSM.addBatch();
                 count++;
 
                 // 达到批次大小，执行批次插入
                 if (count % batchSize == 0) {
-                    pstmt.executeBatch(); // 执行当前批次
+                    PSM.executeBatch(); // 执行当前批次
                     statement.getConnection().commit(); // 提交事务
-                    pstmt.clearBatch(); // 清空批次
+                    PSM.clearBatch(); // 清空批次
                     System.out.println("已提交批次：" + count + " 条数据");
                 }
             }
 
             // 4. 处理剩余数据（不足一个批次的部分）
             if (count % batchSize != 0) {
-                pstmt.executeBatch();
+                PSM.executeBatch();
                 statement.getConnection().commit();
                 System.out.println("提交剩余数据，总计插入：" + count + " 条数据");
             }
@@ -96,8 +97,8 @@ public class SqlEntry {
             throw e; // 抛出异常，让调用方感知
         } finally {
             // 5. 资源清理
-            if (pstmt != null) {
-                pstmt.close();
+            if (PSM != null) {
+                PSM.close();
             }
             // 确保恢复自动提交（避免影响后续操作）
             if (statement.getConnection() != null && !statement.getConnection().getAutoCommit()) {
