@@ -33,8 +33,9 @@ import org.slf4j.Logger;
 import java.lang.reflect.Field;
 
 import static com.PinkCats.worldprotect.Database.SqlInit.DataBaseInit;
+import static com.PinkCats.worldprotect.event.minecraft.WpBlockEvent.RegisterBlockEvents;
 import static com.PinkCats.worldprotect.event.minecraft.ServerTick.RegisterWorldProtectKinetic;
-import static com.PinkCats.worldprotect.event.minecraft.BlockEvent.RegisterEvents;
+import static com.PinkCats.worldprotect.event.minecraft.WpItemEvent.RegisterItemEvents;
 
 // The value here should match an entry in the META-INF/mods.toml file
 @Mod(Worldprotect.MODID)
@@ -97,8 +98,8 @@ public class Worldprotect {
 
         // Register the item to a creative tab
         modEventBus.addListener(this::addCreative);
-
-        RegisterEvents();
+        RegisterBlockEvents();
+        RegisterItemEvents();
         RegisterWorldProtectKinetic();
 
         try {

@@ -197,6 +197,11 @@ dependencies {
     additionalRuntimeClasspath "com.mysql:mysql-connector-j:${jdbc_version}"
     //modImplementation("curse.maven:lionfish-api-1001614:5922047")
 
+    //observable
+    modImplementation("curse.maven:observable-509575:5643037")
+    modImplementation("curse.maven:architectury-api-419699:5137938")
+    modImplementation("curse.maven:kotlin-for-forge-351264:7291067")
+
 }
 
 processResources {
