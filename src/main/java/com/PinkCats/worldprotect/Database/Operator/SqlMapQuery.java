@@ -1,5 +1,5 @@
 package com.PinkCats.worldprotect.Database.Operator;
-
+import java.nio.ByteBuffer;
 import com.PinkCats.worldprotect.Database.Item.RecordPlayer;
 
 import java.sql.PreparedStatement;
@@ -10,6 +10,57 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class SqlMapQuery {
+
+    //ShortNbt Map Handler
+    public static Map<ByteBuffer, Integer> ShortNbtMapID = new HashMap<>();
+    public static int FetchMapShortNbtId(Statement s, byte[] item_id) throws SQLException {
+
+        ByteBuffer key = ByteBuffer.wrap(item_id);
+        Integer result = ShortNbtMapID.get(key);
+
+        if (result == null) {
+            InsertMapShortNbt(s, item_id);
+            UpdateMapShortNbt(s);
+            return FetchMapShortNbtId(s,item_id);
+        } else
+            return result;
+    }
+
+    public static void UpdateMapShortNbt(Statement statement) throws  SQLException {
+        ShortNbtMapID.clear();
+        String querySql = "SELECT id, nbt FROM Map_Nbt"; // 替换为你的表名和字段名
+        ResultSet rs = statement.executeQuery(querySql);
+        while (rs.next()) {
+            int id = rs.getInt("id");
+            byte[] nbtBlob = rs.getBytes("nbt");
+            ByteBuffer nbtBuffer = ByteBuffer.wrap(nbtBlob);
+            ShortNbtMapID.put(nbtBuffer, id);
+        }
+        rs.close();
+    }
+
+    public static void InsertMapShortNbt(Statement statement, byte[] nbtBlob) throws SQLException {
+        if (nbtBlob == null || nbtBlob.length == 0) {
+            System.err.println("插入失败：nbt 不能为空");
+            return;
+        }
+        PreparedStatement stmt;
+        String insertSql = "INSERT INTO Map_Nbt (nbt) VALUES (?)";
+        stmt = statement.getConnection().prepareStatement(insertSql);
+        stmt.setBytes(1, nbtBlob);
+        stmt.executeUpdate();
+    }
+
+
+
+
+
+
+
+
+
+
+
 
 
     //Item Map Handler

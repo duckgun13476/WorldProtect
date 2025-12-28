@@ -53,7 +53,6 @@ public class RecordItem {
     }
     
     public int getItemData() {
-        isSafeToShort(this.ItemData, "ItemData");
         return ItemData;
     }
 
@@ -76,7 +75,7 @@ public class RecordItem {
     }
     
 
-    public void setCount(short count) {
+    public void setCount(int count) {
         this.count = count;
     }
 

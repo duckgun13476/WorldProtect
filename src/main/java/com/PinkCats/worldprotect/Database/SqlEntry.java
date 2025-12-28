@@ -62,7 +62,7 @@ public class SqlEntry {
                 PSM.setInt(5, item.getY());
                 PSM.setInt(6, item.getZ());
                 PSM.setInt(7, item.getItemData());
-                PSM.setShort(8, (short) item.getCount());
+                PSM.setInt(8, item.getCount());
                 PSM.setShort(9, item.getBehaviour());
                 PSM.setShort(10, (short) item.getRollback());
 

@@ -101,7 +101,7 @@ public class WorldProtectKinetic {
 
             for (RecordItem LockedMap : ItemsAfterAlgorith) {
                 if (RecordItem.CanBulk(LockedMap, ItemMap)){
-                    LockedMap.setCount((short) (LockedMap.getCount()+ItemMap.getCount()));
+                    LockedMap.setCount((LockedMap.getCount()+ItemMap.getCount()));
                     continue outer;
                 }
             }

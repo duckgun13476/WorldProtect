@@ -20,12 +20,13 @@ public class SqlInit {
         SafeSql(SqlInit::UpdateMapSelf);
     }
 
-    private static void UpdateMapSelf(Statement statement) throws SQLException {
-        UpdateMapItem(statement);
-        UpdateMapBlock(statement);
-        UpdateMapWorld(statement);
-        UpdateMapBehaviour(statement);
-        UpdateMapPlayer(statement);
+    private static void UpdateMapSelf(Statement s) throws SQLException {
+        UpdateMapItem(s);
+        UpdateMapBlock(s);
+        UpdateMapWorld(s);
+        UpdateMapBehaviour(s);
+        UpdateMapPlayer(s);
+        UpdateMapShortNbt(s);
     }
 
 
@@ -142,7 +143,7 @@ public class SqlInit {
                     "y INT NOT NULL," +
                     "z INT NOT NULL," +
                     "itemdata INT DEFAULT NULL," +
-                    "count SMALLINT NOT NULL," +
+                    "count INT NOT NULL," +
                     "Behaviour SMALLINT NOT NULL," +
                     "rollback TINYINT NOT NULL" +
 
@@ -193,6 +194,17 @@ public class SqlInit {
 
         //Map_Nbt
         tableName = "Map_Nbt";
+        NbtList(statement, tableName);
+
+        tableName = "Map_BigNbt";
+        NbtList(statement, tableName);
+
+
+    }
+
+    private static void NbtList(Statement statement, String tableName) throws SQLException {
+        String checkTableQuery;
+        ResultSet tableResultSet;
         checkTableQuery = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES " +
                 "WHERE TABLE_SCHEMA = '" + DATABASE_NAME + "' AND TABLE_NAME = '" + tableName + "'";
         tableResultSet = statement.executeQuery(checkTableQuery);
@@ -205,7 +217,6 @@ public class SqlInit {
         }
         tableResultSet.close();
     }
-
 
 
 }
