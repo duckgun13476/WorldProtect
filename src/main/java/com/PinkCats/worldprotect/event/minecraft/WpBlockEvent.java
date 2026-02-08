@@ -1,8 +1,14 @@
 package com.PinkCats.worldprotect.event.minecraft;
 
+import com.PinkCats.worldprotect.Database.GUI.mes;
+import com.PinkCats.worldprotect.Database.Item.RecordBlock;
+import com.PinkCats.worldprotect.Database.Item.RecordBlockRaw;
 import com.PinkCats.worldprotect.Database.Item.RecordItemRaw;
+import com.PinkCats.worldprotect.Database.Lib.NBTData;
 import com.mojang.datafixers.types.templates.Tag;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtIo;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
@@ -17,8 +23,10 @@ import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
+import java.io.ByteArrayOutputStream;
 import java.util.stream.Stream;
 
+import static com.PinkCats.worldprotect.Database.WorldProtectKinetic.BlockRawQueue;
 import static com.PinkCats.worldprotect.Database.WorldProtectKinetic.ItemRawQueue;
 
 
@@ -27,38 +35,86 @@ public class WpBlockEvent {
 
 
     @SubscribeEvent
-    public void BlockBreakEvent(BlockEvent.BreakEvent event) {
+    public void onBlockBreak(BlockEvent.BreakEvent event) {
+        // ===== 主线程最早返回 =====
+        Level level = (Level) event.getLevel();
+        if (level.isClientSide) return;
+
         Player player = event.getPlayer();
-        Block Block = event.getState().getBlock();
-        Stream<TagKey<Block>> tag = event.getState().getTags();
+        BlockPos pos = event.getPos();
+        BlockState state = event.getState();
+        Block block = state.getBlock();
 
-        System.out.println(player.getGameProfile().getName());
-        System.out.println(tag);
-        System.out.println(Block);
+        // ---------- 快路径：无 BlockEntity ----------
+        if (!state.hasBlockEntity()) {
+            boolean ok = BlockRawQueue.offer(new RecordBlockRaw(
+                    player.getName().getString(),
+                    player.getStringUUID(),
+                    player.level().dimension().location().toString(),
+                    pos.getX(),
+                    pos.getY(),
+                    pos.getZ(),
+                    null,                       // 🚀 没有 NBT
+                    block.getDescriptionId(),           // 只存 Block ID
+                    "BlockBreak"
+            ));
+            if (!ok) {
+                System.out.println("BlockBreakEvent Not Record!");
+            }
+            return;
+        }
 
+        // ---------- 完整路径：有 BlockEntity ----------
+        BlockEntity be = level.getBlockEntity(pos);
+        if (be == null) {
+            mes.debug("[BREAK][BE] state says hasBlockEntity, but getBlockEntity() == null");
+            return;
+        }
 
-        //if (HasNbt)
-        //    System.out.println(event.getItem().getItem().getTag()); //nbt
-        //System.out.println(ItemCount);  //count
+        byte[] nbtBytes;
+        try {
+            CompoundTag tag = be.saveWithFullMetadata();
+            nbtBytes = NBTData.nbtToBlob(tag);
+        } catch (Exception e) {
+            mes.debug("[BREAK][BE] NBT serialize failed: " + e);
+            return;
+        }
+
+        boolean ok = BlockRawQueue.offer(new RecordBlockRaw(
+                player.getName().getString(),
+                player.getStringUUID(),
+                player.level().dimension().location().toString(),
+                pos.getX(),
+                pos.getY(),
+                pos.getZ(),
+                nbtBytes,
+                block.toString(),
+                "BlockBreak"
+        ));
+        if (!ok) {
+            System.out.println("BlockBreakEvent Not Record!");
+        }
     }
 
 
+
     @SubscribeEvent
-    public void BlockBreakEvent(BlockEvent.EntityPlaceEvent event) {
+    public void BlockPlaceEvent(BlockEvent.EntityPlaceEvent event) {
         Entity entity = event.getEntity();
         BlockState BlockState = event.getState();
         Stream<TagKey<Block>> tag = event.getState().getTags();
-        System.out.println(entity);
-        System.out.println(tag);
-        System.out.println(BlockState.getBlock());
+        mes.debug("Place");
+        mes.debug(entity);
+        mes.debug(tag);
+        mes.debug(BlockState.getBlock());
 
 
-        if (BlockState.hasBlockEntity()){
-            Level level = (Level) event.getLevel();
-            BlockEntity blockEntity = level.getBlockEntity(event.getPos());
-            CompoundTag nbt = blockEntity.getPersistentData();
-            System.out.println(nbt);
-        }
+        //if (BlockState.hasBlockEntity()){
+        //    Level level = (Level) event.getLevel();
+        //    BlockEntity blockEntity = level.getBlockEntity(event.getPos());
+        //    CompoundTag nbt = blockEntity.getPersistentData();
+        //    System.out.println(nbt);
+        //}
 
         //if (HasNbt)
         //    System.out.println(event.getItem().getItem().getTag()); //nbt

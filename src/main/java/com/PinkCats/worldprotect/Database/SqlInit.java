@@ -1,5 +1,7 @@
 package com.PinkCats.worldprotect.Database;
 
+import com.PinkCats.worldprotect.Database.GUI.mes;
+
 import java.io.IOException;
 import java.sql.*;
 
@@ -15,9 +17,10 @@ public class SqlInit {
     private static final String DATABASE_NAME = "WorldProtect";
 
     public static void DataBaseInit() {
-        System.out.println("DataBaseInit");
+        mes.info("DataBaseInit...");
         SafeSql(SqlInit::EnsureTableExists);
         SafeSql(SqlInit::UpdateMapSelf);
+        mes.info("DataBaseInit Complete！");
     }
 
     private static void UpdateMapSelf(Statement s) throws SQLException {
@@ -38,17 +41,17 @@ public class SqlInit {
                 EnsureDataBaseExists(statement);
                 operation.execute(statement);
             } catch (SQLException e) {
-                System.err.println("发生 SQL 数据库初始化操作异常! "+e.getMessage());
+                mes.error("发生 SQL 数据库初始化操作异常! "+e.getMessage());
             }
         } catch (SQLException e) {
             if (e.getMessage().contains("Communications link failure"))
-                System.out.println("[SQL Link Error] Please Check Port/IP.  Core Message: "+e.getMessage());
+                mes.info("[SQL Link Error] Please Check Port/IP.  Core Message: "+e.getMessage());
             else if(e.getMessage().contains("Access denied for user"))
-                System.out.println("[SQL Varify Error] Please Check Username/Password: "+e.getMessage());
+                mes.info("[SQL Varify Error] Please Check Username/Password: "+e.getMessage());
             else
-                System.out.println("[SQL Other Error]: "+e.getMessage());
+                mes.info("[SQL Other Error]: "+e.getMessage());
         } catch (IOException e) {
-            System.out.println("[IOE Error]: "+e.getMessage());
+            mes.info("[IOE Error]: "+e.getMessage());
         }
 
     }

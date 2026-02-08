@@ -1,5 +1,8 @@
 package com.PinkCats.worldprotect.Database;
 
+import com.PinkCats.worldprotect.Database.GUI.mes;
+import com.PinkCats.worldprotect.Database.Item.RecordBlock;
+import com.PinkCats.worldprotect.Database.Item.RecordBlockRaw;
 import com.PinkCats.worldprotect.Database.Item.RecordItem;
 import com.PinkCats.worldprotect.Database.Item.RecordItemRaw;
 import net.minecraft.world.item.ItemStack;
@@ -12,10 +15,11 @@ import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
-import static com.PinkCats.worldprotect.Database.Lib.NBTData.PackageItemStack;
+import static com.PinkCats.worldprotect.Database.Lib.NBTData.packageItemStack;
 import static com.PinkCats.worldprotect.Database.Lib.TimeUtils.getCurrentTimestamp;
 import static com.PinkCats.worldprotect.Database.Operator.SqlMapQuery.*;
 import static com.PinkCats.worldprotect.Database.Operator.SqlNbtQuery.InsertMapNbtItem;
+import static com.PinkCats.worldprotect.Database.SqlEntry.batchInsertRecordBlock;
 import static com.PinkCats.worldprotect.Database.SqlEntry.batchInsertRecordItem;
 import static com.PinkCats.worldprotect.Database.SqlInit.SafeSql;
 
@@ -23,40 +27,93 @@ public class WorldProtectKinetic {
 
     private static final int QUEUE_CAPACITY = 5000;
 
+
+    // Item Queue
     public static BlockingQueue<RecordItemRaw> ItemRawQueue = new ArrayBlockingQueue<>(QUEUE_CAPACITY);
+
+    // Block Queue
+    public static BlockingQueue<RecordBlockRaw> BlockRawQueue = new ArrayBlockingQueue<>(QUEUE_CAPACITY);
+
+
     public static List<RecordItem> recordItemList = new ArrayList<>();
+    public static List<RecordBlock> recordBlockList = new ArrayList<>();
+
 
     public static void WorldProtectKineticTick(){
 
-        if (ItemRawQueue.isEmpty())
-            return;
-        SafeSql((s)-> {
-            CookItemData(s);
+        if (!ItemRawQueue.isEmpty())
+            SafeSql((s)-> {
+                mes.info("Insert Item");
+                CookItemData(s);
+                batchInsertRecordItem(s, recordItemList, 1000);
+                recordItemList.clear();
+            });
 
-            batchInsertRecordItem(s, recordItemList, 1000);
-        });
+        if (!BlockRawQueue.isEmpty())
+            SafeSql((s)-> {
+                mes.info("Insert Block");
+                CookBlockData(s);
+                batchInsertRecordBlock(s, recordBlockList, 1000);
+                recordItemList.clear();
 
-
+            });
 
     }
 
-    private static void CookItemData(Statement s) throws SQLException, IOException {
+    private static void CookBlockData(Statement s) throws SQLException {
+        List<RecordBlockRaw> BlocksToProcess = new ArrayList<>();
+        mes.info(BlockRawQueue.size());
+        BlockRawQueue.drainTo(BlocksToProcess);
 
+
+        if (BlocksToProcess.isEmpty())
+            return;
+
+        // Map and insert
+        List<RecordBlock> BlocksAfterMap = new ArrayList<>();
+        for (RecordBlockRaw recordBlockRaw : BlocksToProcess) {
+
+            int WorldMap = FetchMapWorldId(s,recordBlockRaw.getWorld());
+            int BehaviourMap = FetchMapBehaviourId(s,recordBlockRaw.getBehaviour());
+            int OperatorMap = FetchMapOperatorId(s,recordBlockRaw.getOperator(),recordBlockRaw.getOperatorUUID());
+            int BlockMap;
+
+            String BlockId = recordBlockRaw.getBlockId();
+            BlockMap = FetchMapBlockId(s,BlockId);
+
+
+            if (recordBlockRaw.hasBlockEntityData()) {
+                BlockMap = - InsertMapNbtItem(s,recordBlockRaw.getNbtBytes());
+            }
+
+            BlocksAfterMap.add(
+                    new RecordBlock(
+                            getCurrentTimestamp(),
+                            OperatorMap,
+                            WorldMap,
+                            recordBlockRaw.getX(),
+                            recordBlockRaw.getY(),
+                            recordBlockRaw.getZ(),
+                            BlockMap,
+                            BehaviourMap,
+                            0
+                    )
+            );
+        }
+        recordBlockList.addAll(BlocksAfterMap);
+        for (RecordBlock pa : recordBlockList){
+            mes.debug(pa.toString());
+        }
+    }
+
+
+    private static void CookItemData(Statement s) throws SQLException, IOException {
 
         List<RecordItemRaw> ItemsToProcess = new ArrayList<>();
         ItemRawQueue.drainTo(ItemsToProcess);
 
-        if (ItemsToProcess.isEmpty()) {
+        if (ItemsToProcess.isEmpty())
             return;
-        }
-
-
-
-
-
-
-
-        recordItemList.clear();
 
         // Map and insert
         List<RecordItem> ItemsAfterMap = new ArrayList<>();
@@ -70,7 +127,7 @@ public class WorldProtectKinetic {
             ItemStack item = recordItemRaw.getItemdata();
             ItemMap = FetchMapItemId(s,item.getItem().getDescriptionId());
             if (item.hasTag()) {
-                ItemMap = - InsertMapNbtItem(s,PackageItemStack(item));
+                ItemMap = - InsertMapNbtItem(s,packageItemStack(item));
             }
 
             ItemsAfterMap.add(
@@ -112,9 +169,9 @@ public class WorldProtectKinetic {
         // Drain All element.
         recordItemList.addAll(ItemsAfterAlgorith);
 
-
-
     }
+
+
 
 
 }

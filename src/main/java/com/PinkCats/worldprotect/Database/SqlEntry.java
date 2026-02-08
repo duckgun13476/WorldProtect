@@ -1,6 +1,8 @@
 package com.PinkCats.worldprotect.Database;
 
+import com.PinkCats.worldprotect.Database.GUI.mes;
 import com.PinkCats.worldprotect.Database.Item.RecordItem;
+import com.PinkCats.worldprotect.Database.Item.RecordBlock;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -75,7 +77,7 @@ public class SqlEntry {
                     PSM.executeBatch(); // 执行当前批次
                     statement.getConnection().commit(); // 提交事务
                     PSM.clearBatch(); // 清空批次
-                    System.out.println("已提交批次：" + count + " 条数据");
+                    mes.info("已提交批次：" + count + " 条数据");
                 }
             }
 
@@ -83,17 +85,17 @@ public class SqlEntry {
             if (count % batchSize != 0) {
                 PSM.executeBatch();
                 statement.getConnection().commit();
-                System.out.println("提交剩余数据，总计插入：" + count + " 条数据");
+                mes.info("提交剩余数据，总计插入：" + count + " 条数据");
             }
 
             // 恢复自动提交
             statement.getConnection().setAutoCommit(true);
-            System.out.println("批量插入完成，共处理有效数据：" + count + " 条");
+            mes.info("批量插入完成，共处理有效数据：" + count + " 条");
 
         } catch (SQLException e) {
             // 批量插入失败，回滚事务
             statement.getConnection().rollback();
-            System.err.println("批量插入失败，已回滚事务：" + e.getMessage());
+            mes.error("批量插入失败，已回滚事务：" + e.getMessage());
             throw e; // 抛出异常，让调用方感知
         } finally {
             // 5. 资源清理
@@ -108,6 +110,73 @@ public class SqlEntry {
     }
 
 
+    public static void batchInsertRecordBlock(
+            Statement statement,
+            List<RecordBlock> recordBlockList,
+            int batchSize
+    ) throws SQLException {
+
+        if (recordBlockList == null || recordBlockList.isEmpty()) {
+            return;
+        }
+        if (batchSize <= 0) {
+            batchSize = 500;
+        }
+
+        String insertSql =
+                "INSERT INTO Record_Block (" +
+                        "time, operator, world, x, y, z, blockdata, Behaviour, rollback" +
+                        ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+        PreparedStatement psm = null;
+        try {
+            statement.getConnection().setAutoCommit(false);
+            psm = statement.getConnection().prepareStatement(insertSql);
+
+            int count = 0;
+            for (RecordBlock block : recordBlockList) {
+
+                // 如果你有 validateRecordBlock，这里可以加
+                // if (!validateRecordBlock(block)) continue;
+
+                psm.setInt(1, block.getTime());
+                psm.setShort(2, block.getOperator());
+                psm.setShort(3, block.getWorld());
+                psm.setInt(4, block.getX());
+                psm.setInt(5, block.getY());
+                psm.setInt(6, block.getZ());
+                psm.setInt(7, block.getBlockData());
+                psm.setShort(8, block.getBehaviour());
+                psm.setShort(9, (short) block.getRollback());
+
+                psm.addBatch();
+                count++;
+
+                if (count % batchSize == 0) {
+                    psm.executeBatch();
+                    statement.getConnection().commit();
+                    psm.clearBatch();
+                }
+            }
+
+            if (count % batchSize != 0) {
+                psm.executeBatch();
+                statement.getConnection().commit();
+            }
+
+            statement.getConnection().setAutoCommit(true);
+
+        } catch (SQLException e) {
+            statement.getConnection().rollback();
+            throw e;
+        } finally {
+            if (psm != null) psm.close();
+            if (statement.getConnection() != null &&
+                    !statement.getConnection().getAutoCommit()) {
+                statement.getConnection().setAutoCommit(true);
+            }
+        }
+    }
 
 
 }

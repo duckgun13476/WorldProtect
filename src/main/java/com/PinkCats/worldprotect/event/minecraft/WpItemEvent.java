@@ -25,7 +25,7 @@ public class WpItemEvent {
     @SubscribeEvent
     public void EntityItemPickupEvent(EntityItemPickupEvent event) {
         Player player = event.getEntity();
-        ItemStack ItemStack = event.getItem().getItem().copy();;
+        ItemStack ItemStack = event.getItem().getItem().copy();
         boolean IsFull = ItemRawQueue.offer(new RecordItemRaw(
                 player.getName().getString(),
                 player.getStringUUID(),
@@ -44,7 +44,7 @@ public class WpItemEvent {
     @SubscribeEvent
     public void EntityItemDropEvent(ItemTossEvent event) {
         Player player = event.getPlayer();
-        ItemStack ItemStack = event.getEntity().getItem();
+        ItemStack ItemStack = event.getEntity().getItem().copy();
         boolean IsFull = ItemRawQueue.offer(new RecordItemRaw(
                 player.getName().getString(),
                 player.getStringUUID(),

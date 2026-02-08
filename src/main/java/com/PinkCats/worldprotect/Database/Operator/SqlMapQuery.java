@@ -1,5 +1,7 @@
 package com.PinkCats.worldprotect.Database.Operator;
 import java.nio.ByteBuffer;
+
+import com.PinkCats.worldprotect.Database.GUI.mes;
 import com.PinkCats.worldprotect.Database.Item.RecordPlayer;
 
 import java.sql.PreparedStatement;
@@ -28,7 +30,7 @@ public class SqlMapQuery {
 
     public static void UpdateMapShortNbt(Statement statement) throws  SQLException {
         ShortNbtMapID.clear();
-        String querySql = "SELECT id, nbt FROM Map_Nbt"; // 替换为你的表名和字段名
+        String querySql = "SELECT id, nbt FROM Map_Nbt";
         ResultSet rs = statement.executeQuery(querySql);
         while (rs.next()) {
             int id = rs.getInt("id");
@@ -41,7 +43,7 @@ public class SqlMapQuery {
 
     public static void InsertMapShortNbt(Statement statement, byte[] nbtBlob) throws SQLException {
         if (nbtBlob == null || nbtBlob.length == 0) {
-            System.err.println("插入失败：nbt 不能为空");
+            mes.error("插入失败：nbt 不能为空");
             return;
         }
         PreparedStatement stmt;
@@ -77,7 +79,7 @@ public class SqlMapQuery {
 
     public static void UpdateMapItem(Statement statement) throws  SQLException {
         ItemMapID.clear();
-        String querySql = "SELECT id, item_id FROM Map_Item"; // 替换为你的表名和字段名
+        String querySql = "SELECT id, item_id FROM Map_Item";
         ResultSet rs = statement.executeQuery(querySql);
         while (rs.next()) {
             int id = rs.getInt("id");
@@ -89,7 +91,7 @@ public class SqlMapQuery {
 
     public static void InsertMapItem(Statement statement, String itemId) throws SQLException {
         if (itemId == null || itemId.trim().isEmpty()) {
-            System.err.println("插入失败：item_id 不能为空");
+            mes.error("插入失败：item_id 不能为空");
             return;
         }
         PreparedStatement stmt;
@@ -114,7 +116,7 @@ public class SqlMapQuery {
 
     public static void UpdateMapBlock(Statement statement) throws  SQLException {
         BlockMapID.clear();
-        String querySql = "SELECT id, block_id FROM Map_Block"; // 替换为你的表名和字段名
+        String querySql = "SELECT id, block_id FROM Map_Block";
         ResultSet rs = statement.executeQuery(querySql);
         while (rs.next()) {
             int id = rs.getInt("id");
@@ -126,7 +128,7 @@ public class SqlMapQuery {
 
     public static void InsertMapBlock(Statement statement, String blockId) throws SQLException {
         if (blockId == null || blockId.trim().isEmpty()) {
-            System.err.println("插入失败：item_id 不能为空");
+            mes.error("插入失败：item_id 不能为空");
             return;
         }
         PreparedStatement stmt;
@@ -151,7 +153,7 @@ public class SqlMapQuery {
 
     public static void UpdateMapWorld(Statement statement) throws  SQLException {
         WorldMapID.clear();
-        String querySql = "SELECT id, world FROM Map_World"; // 替换为你的表名和字段名
+        String querySql = "SELECT id, world FROM Map_World";
         ResultSet rs = statement.executeQuery(querySql);
         while (rs.next()) {
             int id = rs.getInt("id");
@@ -189,7 +191,7 @@ public class SqlMapQuery {
 
     public static void UpdateMapBehaviour(Statement statement) throws  SQLException {
         BehaviourMapID.clear();
-        String querySql = "SELECT id, map_behaviour FROM Map_Behaviour"; // 替换为你的表名和字段名
+        String querySql = "SELECT id, map_behaviour FROM Map_Behaviour";
         ResultSet rs = statement.executeQuery(querySql);
         while (rs.next()) {
             int id = rs.getInt("id");
@@ -201,7 +203,7 @@ public class SqlMapQuery {
 
     public static void InsertMapBehaviour(Statement statement, String BehaviourId) throws SQLException {
         if (BehaviourId == null || BehaviourId.trim().isEmpty()) {
-            System.err.println("插入失败：map_behaviour 不能为空");
+            mes.error("插入失败：map_behaviour 不能为空");
             return;
         }
         PreparedStatement stmt;
@@ -229,7 +231,7 @@ public class SqlMapQuery {
 
     public static void UpdateMapPlayer(Statement statement) throws  SQLException {
         PlayerMapID.clear();
-        String querySql = "SELECT id, uuid,operator FROM Map_Operator"; // 替换为你的表名和字段名
+        String querySql = "SELECT id, uuid,operator FROM Map_Operator";
         ResultSet rs = statement.executeQuery(querySql);
         while (rs.next()) {
             int id = rs.getInt("id");
@@ -244,7 +246,7 @@ public class SqlMapQuery {
         String PlayerName = Player.getOperator();
 
         if (PlayerId == null || PlayerName == null || PlayerId.trim().isEmpty()) {
-            System.err.println("插入失败：map_player 不能为空");
+            mes.error("插入失败：map_player 不能为空");
             return;
         }
         PreparedStatement stmt;

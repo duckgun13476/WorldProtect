@@ -1,6 +1,7 @@
 package com.PinkCats.worldprotect.event.minecraft;
 
 
+import com.PinkCats.worldprotect.Database.GUI.mes;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -21,7 +22,7 @@ public class ServerTick {
                 long time = System.currentTimeMillis();
                 WorldProtectKineticTick();
                 if (System.currentTimeMillis() - time > 1000)
-                    System.out.println("Run time: "+(System.currentTimeMillis() - time) + " ms");
+                    mes.debug("Loop RunTime: "+(System.currentTimeMillis() - time) + " ms");
 
             } finally {
                 TaskLock.set(false);
@@ -30,7 +31,7 @@ public class ServerTick {
     }
 
     private void Tick() {
-        String threadName = "WorldProtectKineticMonitor";
+        String threadName = "WorldProtectKineticLoop";
         Thread taskThread = new Thread(ServerTick::RunTask, threadName);
         taskThread.start();
     }

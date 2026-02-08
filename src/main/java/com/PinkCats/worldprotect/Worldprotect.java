@@ -1,5 +1,6 @@
 package com.PinkCats.worldprotect;
 
+import com.PinkCats.worldprotect.Database.GUI.mes;
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.registries.Registries;
@@ -48,10 +49,12 @@ public class Worldprotect {
         return ResourceLocation.fromNamespaceAndPath(NameSpace,Path);
     }
 
+
+
     // Define mod id in a common place for everything to reference
     public static final String MODID = "worldprotect";
     // Directly reference a slf4j logger
-    private static final Logger LOGGER = LogUtils.getLogger();
+    public static final Logger LOGGER = LogUtils.getLogger();
     // Create a Deferred Register to hold Blocks which will all be registered under the "worldprotect" namespace
     public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, MODID);
     // Create a Deferred Register to hold Items which will all be registered under the "worldprotect" namespace
@@ -105,7 +108,7 @@ public class Worldprotect {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
         } catch (ClassNotFoundException e) {
-            System.out.println("Failed to load MySQL driver");
+            mes.error("Failed to load MySQL driver");
         }
 
 

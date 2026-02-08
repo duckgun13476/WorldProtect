@@ -1,5 +1,7 @@
 package com.PinkCats.worldprotect.Database.Operator;
 
+import com.PinkCats.worldprotect.Database.GUI.mes;
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -15,7 +17,7 @@ public class SqlNbtQuery {
 
     public static int InsertMapNbtItem(Statement statement, byte[] nbtBlob) throws SQLException {
         if (nbtBlob == null ) {
-            System.err.println("插入失败：data 不能为空");
+            mes.error("插入失败：data 不能为空");
             return 0;
         }
 
