@@ -5,22 +5,27 @@ import com.PinkCats.worldprotect.Database.GUI.mes;
 import java.io.IOException;
 import java.sql.*;
 
+import static com.PinkCats.worldprotect.Config.*;
 import static com.PinkCats.worldprotect.Database.Operator.SqlMapQuery.*;
 
 public class SqlInit {
 
-    // 数据库 URL
-    private static final String DB_URL = "192.168.147.111:3309"; // 替换为你的数据库名称
-    // 数据库凭据
-    private static final String USER = "root"; // 替换为你的用户名
-    private static final String PASSWORD = "36900367459b"; // 替换为你的密码
-    private static final String DATABASE_NAME = "WorldProtect";
+    private static boolean IsDatabaseAvailable = false;
+
+    private static int FailedCount = 0;
+    private static boolean CanUseDatabase = true;
 
     public static void DataBaseInit() {
         mes.info("DataBaseInit...");
         SafeSql(SqlInit::EnsureTableExists);
-        SafeSql(SqlInit::UpdateMapSelf);
-        mes.info("DataBaseInit Complete！");
+        if (IsDatabaseAvailable) {
+            SafeSql(SqlInit::UpdateMapSelf);
+            mes.info("DataBaseInit Complete！");
+        } else {
+            mes.error("DataBaseInit Failed！(WorldProtect will disable) Please Check Message");
+            CanUseDatabase = false;
+        }
+
     }
 
     private static void UpdateMapSelf(Statement s) throws SQLException {
@@ -34,20 +39,25 @@ public class SqlInit {
 
 
     static void SafeSql(SqlInterface.SQLOperation operation) {
+        if (!CanUseDatabase) {
+            FailedCount++;
+            mes.error("Database Not Available, Record Failed. Please Check Database Failed time ["+FailedCount+"]");
+            return;
+        }
 
-
-        try (Connection connection = DriverManager.getConnection("jdbc:mysql://"+DB_URL+"/", USER, PASSWORD); Statement statement = connection.createStatement()) {
+        try (Connection connection = DriverManager.getConnection("jdbc:mysql://"+db_url+"/", user, password); Statement statement = connection.createStatement()) {
             try {
                 EnsureDataBaseExists(statement);
                 operation.execute(statement);
+                IsDatabaseAvailable = true;
             } catch (SQLException e) {
                 mes.error("发生 SQL 数据库初始化操作异常! "+e.getMessage());
             }
         } catch (SQLException e) {
             if (e.getMessage().contains("Communications link failure"))
-                mes.info("[SQL Link Error] Please Check Port/IP.  Core Message: "+e.getMessage());
+                mes.info("[SQL Link Error] Please Check Port/IP: [" + db_url + "] Driver Message: " + e.getMessage());
             else if(e.getMessage().contains("Access denied for user"))
-                mes.info("[SQL Varify Error] Please Check Username/Password: "+e.getMessage());
+                mes.info("[SQL Varify Error] Please Check Username/Password: [" + user+"|"+password + "] Driver Message: " + e.getMessage());
             else
                 mes.info("[SQL Other Error]: "+e.getMessage());
         } catch (IOException e) {
