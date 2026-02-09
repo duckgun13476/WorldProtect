@@ -69,13 +69,13 @@ public class SqlInit {
 
     // 检查数据库是否存在
     private static void EnsureDataBaseExists(Statement statement) throws SQLException {
-        String checkDatabaseQuery = "SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = '" + DATABASE_NAME + "'";
+        String checkDatabaseQuery = "SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = '" + database_name + "'";
         ResultSet resultSet = statement.executeQuery(checkDatabaseQuery);
         if (!resultSet.next()){
-            String createDatabaseQuery = "CREATE DATABASE " + DATABASE_NAME;
+            String createDatabaseQuery = "CREATE DATABASE " + database_name;
             statement.executeUpdate(createDatabaseQuery);
         }
-        statement.executeUpdate("USE " + DATABASE_NAME);
+        statement.executeUpdate("USE " + database_name);
     }
 
     public static void EnsureTableExists(Statement statement) throws SQLException {
@@ -86,7 +86,7 @@ public class SqlInit {
         //Map_Behaviour
         tableName = "Map_Behaviour";
         checkTableQuery = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES " +
-                "WHERE TABLE_SCHEMA = '" + DATABASE_NAME + "' AND TABLE_NAME = '" + tableName + "'";
+                "WHERE TABLE_SCHEMA = '" + database_name + "' AND TABLE_NAME = '" + tableName + "'";
         tableResultSet = statement.executeQuery(checkTableQuery);
         if (!tableResultSet.next()) {
             String createTableQuery = "CREATE TABLE " + tableName + " (" +
@@ -101,7 +101,7 @@ public class SqlInit {
         //Map_Operator
         tableName = "Map_Operator";
         checkTableQuery = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES " +
-                "WHERE TABLE_SCHEMA = '" + DATABASE_NAME + "' AND TABLE_NAME = '" + tableName + "'";
+                "WHERE TABLE_SCHEMA = '" + database_name + "' AND TABLE_NAME = '" + tableName + "'";
         tableResultSet = statement.executeQuery(checkTableQuery);
         if (!tableResultSet.next()) {
             String createTableQuery = "CREATE TABLE " + tableName + " (" +
@@ -116,7 +116,7 @@ public class SqlInit {
         //Map_World
         tableName = "Map_World";
         checkTableQuery = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES " +
-                "WHERE TABLE_SCHEMA = '" + DATABASE_NAME + "' AND TABLE_NAME = '" + tableName + "'";
+                "WHERE TABLE_SCHEMA = '" + database_name + "' AND TABLE_NAME = '" + tableName + "'";
         tableResultSet = statement.executeQuery(checkTableQuery);
         if (!tableResultSet.next()) {
             String createTableQuery = "CREATE TABLE " + tableName + " (" +
@@ -130,7 +130,7 @@ public class SqlInit {
         //Map_Item
         tableName = "Map_Item";
         checkTableQuery = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES " +
-                "WHERE TABLE_SCHEMA = '" + DATABASE_NAME + "' AND TABLE_NAME = '" + tableName + "'";
+                "WHERE TABLE_SCHEMA = '" + database_name + "' AND TABLE_NAME = '" + tableName + "'";
         tableResultSet = statement.executeQuery(checkTableQuery);
         if (!tableResultSet.next()) {
             String createTableQuery = "CREATE TABLE " + tableName + " (" +
@@ -144,7 +144,7 @@ public class SqlInit {
         //Record_Item
         tableName = "Record_Item";
         checkTableQuery = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES " +
-                "WHERE TABLE_SCHEMA = '" + DATABASE_NAME + "' AND TABLE_NAME = '" + tableName + "'";
+                "WHERE TABLE_SCHEMA = '" + database_name + "' AND TABLE_NAME = '" + tableName + "'";
         tableResultSet = statement.executeQuery(checkTableQuery);
         if (!tableResultSet.next()) {
             String createTableQuery = "CREATE TABLE " + tableName + " (" +
@@ -170,7 +170,7 @@ public class SqlInit {
         //Map_Block
         tableName = "Map_Block";
         checkTableQuery = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES " +
-                "WHERE TABLE_SCHEMA = '" + DATABASE_NAME + "' AND TABLE_NAME = '" + tableName + "'";
+                "WHERE TABLE_SCHEMA = '" + database_name + "' AND TABLE_NAME = '" + tableName + "'";
         tableResultSet = statement.executeQuery(checkTableQuery);
         if (!tableResultSet.next()) {
             String createTableQuery = "CREATE TABLE " + tableName + " (" +
@@ -184,7 +184,7 @@ public class SqlInit {
         //Record_Block
         tableName = "Record_Block";
         checkTableQuery = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES " +
-                "WHERE TABLE_SCHEMA = '" + DATABASE_NAME + "' AND TABLE_NAME = '" + tableName + "'";
+                "WHERE TABLE_SCHEMA = '" + database_name + "' AND TABLE_NAME = '" + tableName + "'";
         tableResultSet = statement.executeQuery(checkTableQuery);
         if (!tableResultSet.next()) {
             String createTableQuery = "CREATE TABLE " + tableName + " (" +
@@ -219,7 +219,7 @@ public class SqlInit {
         String checkTableQuery;
         ResultSet tableResultSet;
         checkTableQuery = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES " +
-                "WHERE TABLE_SCHEMA = '" + DATABASE_NAME + "' AND TABLE_NAME = '" + tableName + "'";
+                "WHERE TABLE_SCHEMA = '" + database_name + "' AND TABLE_NAME = '" + tableName + "'";
         tableResultSet = statement.executeQuery(checkTableQuery);
         if (!tableResultSet.next()) {
             String createTableQuery = "CREATE TABLE " + tableName + " (" +
