@@ -75,6 +75,7 @@ public class Worldprotect {
         output.accept(EXAMPLE_ITEM.get()); // Add the example item to the tab. For your own tabs, this method is preferred over the event
     }).build());
 
+    public static final boolean IsClient =  net.minecraftforge.fml.loading.FMLEnvironment.dist == net.minecraftforge.api.distmarker.Dist.CLIENT;
 
 
 
@@ -163,7 +164,7 @@ public class Worldprotect {
             return contextThreadLocal.get();
 
         } catch (Exception e) {
-            throw new RuntimeException("CreateLazyTick got ERROR in Init:", e);
+            throw new RuntimeException("WorldProtect got ERROR in Init:", e);
         }
     }
 }

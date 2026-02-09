@@ -45,6 +45,9 @@ public class WorldProtectKinetic {
             SafeSql((s)-> {
                 mes.info("Insert Item");
                 CookItemData(s);
+                for (RecordItem pa : recordItemList){
+                    mes.debug(pa.toString());
+                }
                 batchInsertRecordItem(s, recordItemList, 1000);
                 recordItemList.clear();
             });
@@ -53,8 +56,11 @@ public class WorldProtectKinetic {
             SafeSql((s)-> {
                 mes.info("Insert Block");
                 CookBlockData(s);
+                for (RecordBlock pa : recordBlockList){
+                    mes.debug(pa.toString());
+                }
                 batchInsertRecordBlock(s, recordBlockList, 1000);
-                recordItemList.clear();
+                recordBlockList.clear();
 
             });
 
@@ -62,9 +68,7 @@ public class WorldProtectKinetic {
 
     private static void CookBlockData(Statement s) throws SQLException {
         List<RecordBlockRaw> BlocksToProcess = new ArrayList<>();
-        mes.info(BlockRawQueue.size());
         BlockRawQueue.drainTo(BlocksToProcess);
-
 
         if (BlocksToProcess.isEmpty())
             return;
@@ -101,9 +105,6 @@ public class WorldProtectKinetic {
             );
         }
         recordBlockList.addAll(BlocksAfterMap);
-        for (RecordBlock pa : recordBlockList){
-            mes.debug(pa.toString());
-        }
     }
 
 

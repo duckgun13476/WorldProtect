@@ -115,4 +115,18 @@ public class RecordItem {
         return item.getItemData() == item2.getItemData();
     }
 
+    @Override
+    public String toString() {
+        return "RecordItem{" +
+                "time=" + time +
+                ", operator=" + operator +
+                ", world=" + world +
+                ", x=" + x +
+                ", y=" + y +
+                ", z=" + z +
+                ", ItemData=" + ItemData +
+                ", behaviour=" + behaviour +
+                ", rollback=" + rollback +
+                '}';
+    }
 }
