@@ -29,4 +29,6 @@ public class PostFactory {
         // 你可以继续加：BellBlock, ComparatorBlock, RepeaterBlock, LecternBlock, etc.
     }
 
+    public static final String SystemUUID = "SYSTEM_Fire" ;
+
 }
